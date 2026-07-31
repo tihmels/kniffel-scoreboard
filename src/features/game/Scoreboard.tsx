@@ -1,74 +1,73 @@
+import { useState } from 'react'
+import { winners } from '../../domain/game'
 import type { DiceRoll, ScoreCategory } from '../../domain/scoring'
-import { scoringFunctions } from '../../domain/scoring'
+import controls from './controls.module.css'
+import { DiceInput } from './DiceInput'
+import { GameSetup } from './GameSetup'
+import { ScoreGrid } from './ScoreGrid'
 import styles from './Scoreboard.module.css'
+import { useKniffelGame } from './useKniffelGame'
 
-const CATEGORY_LABELS: Record<ScoreCategory, string> = {
-  ones: 'Ones',
-  twos: 'Twos',
-  threes: 'Threes',
-  fours: 'Fours',
-  fives: 'Fives',
-  sixes: 'Sixes',
-  threeOfAKind: 'Three of a kind',
-  fourOfAKind: 'Four of a kind',
-  fullHouse: 'Full house',
-  smallStraight: 'Small straight',
-  largeStraight: 'Large straight',
-  kniffel: 'Kniffel',
-  chance: 'Chance',
-}
-
-const CATEGORY_ORDER = Object.keys(CATEGORY_LABELS) as ScoreCategory[]
-
-// A fixed example roll for this milestone. A real game will manage rolls in state.
-const EXAMPLE_ROLL: DiceRoll = [3, 3, 3, 5, 6]
+const STARTING_DICE: DiceRoll = [1, 1, 1, 1, 1]
 
 export function Scoreboard() {
+  const { state, dispatch } = useKniffelGame()
+  const [dice, setDice] = useState<DiceRoll>(STARTING_DICE)
+
+  if (state.status === 'setup') {
+    return (
+      <section className={styles.card}>
+        <GameSetup state={state} dispatch={dispatch} />
+      </section>
+    )
+  }
+
+  const activePlayer = state.players[state.activePlayerIndex]
+
+  function recordScore(category: ScoreCategory) {
+    if (!activePlayer) return
+    dispatch({ type: 'recordScore', playerId: activePlayer.id, category, dice })
+    setDice(STARTING_DICE)
+  }
+
   return (
-    <section className={styles.card} aria-labelledby="scoreboard-heading">
-      <h2 id="scoreboard-heading">Scorecard preview</h2>
-      <p className={styles.intro}>
-        A static preview wiring the pure scoring domain to the UI. Interactive
-        players and turns arrive in the next milestone.
-      </p>
+    <section className={styles.card}>
+      {state.status === 'playing' && activePlayer && (
+        <>
+          <p className={styles.turn}>
+            Now playing:{' '}
+            <span className={styles.turnName}>{activePlayer.name}</span>
+          </p>
+          <DiceInput dice={dice} onChange={setDice} />
+          <p className={styles.hint}>
+            Enter the dice you rolled, then tap a score in the{' '}
+            <strong>{activePlayer.name}</strong> column to fill that category.
+          </p>
+        </>
+      )}
 
-      <div
-        className={styles.diceRow}
-        role="group"
-        aria-label="Example dice roll"
-      >
-        {EXAMPLE_ROLL.map((die, index) => (
-          <span key={index} className={styles.die}>
-            {die}
+      {state.status === 'finished' && (
+        <div className={styles.banner}>
+          <span className={styles.winner}>
+            🏆{' '}
+            {winners(state)
+              .map((player) => player.name)
+              .join(' & ')}{' '}
+            {winners(state).length > 1 ? 'tie!' : 'wins!'}
           </span>
-        ))}
-      </div>
+          <button
+            type="button"
+            className={`${controls.button} ${controls.primary}`}
+            onClick={() => dispatch({ type: 'reset' })}
+          >
+            New game
+          </button>
+        </div>
+      )}
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th style={{ textAlign: 'right' }}>Score</th>
-          </tr>
-        </thead>
-        <tbody>
-          {CATEGORY_ORDER.map((category) => {
-            const scorer = scoringFunctions[category]
-            return (
-              <tr key={category}>
-                <td>{CATEGORY_LABELS[category]}</td>
-                <td className={styles.score}>
-                  {scorer ? (
-                    scorer(EXAMPLE_ROLL)
-                  ) : (
-                    <span className={styles.pending}>rule TBD</span>
-                  )}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+      <div className={styles.grid}>
+        <ScoreGrid state={state} dice={dice} onRecord={recordScore} />
+      </div>
     </section>
   )
 }

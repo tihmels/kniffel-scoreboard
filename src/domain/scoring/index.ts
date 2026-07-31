@@ -14,3 +14,11 @@ export {
   scoreChance,
   scoringFunctions,
 } from './scoring'
+
+export {
+  UPPER_CATEGORIES,
+  LOWER_CATEGORIES,
+  SCORE_CATEGORIES,
+  UPPER_BONUS_THRESHOLD,
+  UPPER_BONUS,
+} from './categories'

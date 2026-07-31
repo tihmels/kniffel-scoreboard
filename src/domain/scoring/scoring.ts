@@ -51,44 +51,93 @@ function scoreNOfAKind(n: number): ScoringFunction {
   }
 }
 
+/** The distinct faces present in a roll. */
+function distinctFaces(dice: DiceRoll): Set<DieValue> {
+  return new Set(dice)
+}
+
+/**
+ * Full house: three of one face and two of another → fixed 25 points.
+ * Five of a kind does NOT count as a full house (see rule decision below).
+ */
+export const scoreFullHouse: ScoringFunction = (dice) => {
+  const counts = Object.values(countFaces(dice))
+  const isFullHouse = counts.includes(3) && counts.includes(2)
+  return isFullHouse ? 25 : 0
+}
+
+const SMALL_STRAIGHTS: readonly (readonly DieValue[])[] = [
+  [1, 2, 3, 4],
+  [2, 3, 4, 5],
+  [3, 4, 5, 6],
+]
+
+/** Small straight: four consecutive faces → fixed 30 points. */
+export const scoreSmallStraight: ScoringFunction = (dice) => {
+  const faces = distinctFaces(dice)
+  const hasRun = SMALL_STRAIGHTS.some((run) =>
+    run.every((face) => faces.has(face)),
+  )
+  return hasRun ? 30 : 0
+}
+
+/** Large straight: five consecutive faces (1–5 or 2–6) → fixed 40 points. */
+export const scoreLargeStraight: ScoringFunction = (dice) => {
+  const faces = distinctFaces(dice)
+  if (faces.size !== 5) return 0
+  const hasRun =
+    [1, 2, 3, 4, 5].every((face) => faces.has(face as DieValue)) ||
+    [2, 3, 4, 5, 6].every((face) => faces.has(face as DieValue))
+  return hasRun ? 40 : 0
+}
+
+/** Kniffel: five of a kind → fixed 50 points. */
+export const scoreKniffel: ScoringFunction = (dice) => {
+  const hasFive = Object.values(countFaces(dice)).includes(5)
+  return hasFive ? 50 : 0
+}
+
 /** Chance: sum of all five dice, regardless of faces. */
 export const scoreChance: ScoringFunction = (dice) => sumDice(dice)
 
 /**
- * Registry of categories whose scoring is unambiguous across the common
- * Kniffel/Yahtzee rule variants. This is deliberately a `Partial` record:
- * variant-dependent categories are declared in the type system but left
- * unimplemented until a rule decision is made — see OPEN RULE DECISIONS below.
+ * Complete registry of per-category scoring functions. Each maps a roll to the
+ * points it would earn in that category (0 when it does not qualify).
+ *
+ * Rule variant: STANDARD GERMAN KNIFFEL (see RULE DECISIONS below).
  */
-export const scoringFunctions: Partial<Record<ScoreCategory, ScoringFunction>> =
-  {
-    ones: (dice) => scoreUpperSection(dice, UPPER_FACES.ones),
-    twos: (dice) => scoreUpperSection(dice, UPPER_FACES.twos),
-    threes: (dice) => scoreUpperSection(dice, UPPER_FACES.threes),
-    fours: (dice) => scoreUpperSection(dice, UPPER_FACES.fours),
-    fives: (dice) => scoreUpperSection(dice, UPPER_FACES.fives),
-    sixes: (dice) => scoreUpperSection(dice, UPPER_FACES.sixes),
-    threeOfAKind: scoreNOfAKind(3),
-    fourOfAKind: scoreNOfAKind(4),
-    chance: scoreChance,
-  }
+export const scoringFunctions: Record<ScoreCategory, ScoringFunction> = {
+  ones: (dice) => scoreUpperSection(dice, UPPER_FACES.ones),
+  twos: (dice) => scoreUpperSection(dice, UPPER_FACES.twos),
+  threes: (dice) => scoreUpperSection(dice, UPPER_FACES.threes),
+  fours: (dice) => scoreUpperSection(dice, UPPER_FACES.fours),
+  fives: (dice) => scoreUpperSection(dice, UPPER_FACES.fives),
+  sixes: (dice) => scoreUpperSection(dice, UPPER_FACES.sixes),
+  threeOfAKind: scoreNOfAKind(3),
+  fourOfAKind: scoreNOfAKind(4),
+  fullHouse: scoreFullHouse,
+  smallStraight: scoreSmallStraight,
+  largeStraight: scoreLargeStraight,
+  kniffel: scoreKniffel,
+  chance: scoreChance,
+}
 
 /*
- * OPEN RULE DECISIONS (must be resolved before implementing the remaining
- * categories — the choice changes scoring behaviour, so it is not guessed here):
+ * RULE DECISIONS — this project uses STANDARD GERMAN KNIFFEL:
  *
- *  - fullHouse:     fixed 25 points (standard German Kniffel) vs. sum-of-dice
- *                   (some house rules). Also: does "two of a kind + three of a
- *                   kind" of the SAME face (a Kniffel) count as a full house?
- *  - smallStraight: fixed 30 points for four consecutive faces (standard) vs.
- *                   sum-based variants.
- *  - largeStraight: fixed 40 points for five consecutive faces (standard) vs.
- *                   sum-based variants.
- *  - kniffel:       fixed 50 points for five of a kind.
- *  - Kniffel bonus / Joker rule: extra 50 points for each additional Kniffel,
- *                   and whether an extra Kniffel may be used as a wildcard in
- *                   other categories. This affects turn/game aggregation, not a
- *                   single category, and belongs to a future game-scoring module.
- *  - Upper-section bonus: +35 points when the upper section totals >= 63.
- *                   Also an aggregation-level rule, not a per-category one.
+ *  - Upper section:    sum of the dice showing the matching face.
+ *  - Three/four of a kind: sum of ALL dice when at least 3 / 4 share a face.
+ *  - fullHouse:        fixed 25 (a 3-of-a-kind + a distinct pair). Five of a
+ *                      kind is NOT a full house here.
+ *  - smallStraight:    fixed 30 for four consecutive faces.
+ *  - largeStraight:    fixed 40 for five consecutive faces (1–5 or 2–6).
+ *  - kniffel:          fixed 50 for five of a kind.
+ *  - chance:           sum of all dice.
+ *
+ * STILL DEFERRED (game-aggregation rules, not per-category — implemented in the
+ * game-scoring module, not here):
+ *  - Upper-section bonus: +35 when the upper subtotal reaches >= 63.
+ *  - Kniffel bonus / Joker rule: +50 for each additional Kniffel, and using an
+ *    extra Kniffel as a wildcard in other categories. Requires per-turn history
+ *    and is intentionally NOT implemented yet.
  */
