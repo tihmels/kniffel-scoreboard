@@ -38,10 +38,60 @@ describe('chance scoring', () => {
   })
 })
 
-describe('unimplemented categories', () => {
-  it('are absent until a rule variant is chosen', () => {
-    expect(scoringFunctions.fullHouse).toBeUndefined()
-    expect(scoringFunctions.largeStraight).toBeUndefined()
-    expect(scoringFunctions.kniffel).toBeUndefined()
+describe('full house scoring (standard: fixed 25)', () => {
+  const fullHouse = scoringFunctions.fullHouse
+
+  it('awards 25 for three of one face and two of another', () => {
+    expect(fullHouse([2, 2, 2, 5, 5])).toBe(25)
+    expect(fullHouse([6, 6, 1, 1, 1])).toBe(25)
+  })
+
+  it('does not count five of a kind as a full house', () => {
+    expect(fullHouse([4, 4, 4, 4, 4])).toBe(0)
+  })
+
+  it('returns 0 when the pattern is not 3 + 2', () => {
+    expect(fullHouse([2, 2, 2, 2, 5])).toBe(0)
+    expect(fullHouse([1, 2, 3, 4, 5])).toBe(0)
+  })
+})
+
+describe('small straight scoring (fixed 30)', () => {
+  const smallStraight = scoringFunctions.smallStraight
+
+  it('awards 30 for any four consecutive faces', () => {
+    expect(smallStraight([1, 2, 3, 4, 6])).toBe(30)
+    expect(smallStraight([2, 3, 4, 5, 5])).toBe(30)
+    expect(smallStraight([3, 4, 5, 6, 1])).toBe(30)
+  })
+
+  it('returns 0 without four in a row', () => {
+    expect(smallStraight([1, 2, 3, 5, 6])).toBe(0)
+    expect(smallStraight([1, 1, 1, 1, 1])).toBe(0)
+  })
+})
+
+describe('large straight scoring (fixed 40)', () => {
+  const largeStraight = scoringFunctions.largeStraight
+
+  it('awards 40 for five consecutive faces', () => {
+    expect(largeStraight([1, 2, 3, 4, 5])).toBe(40)
+    expect(largeStraight([2, 3, 4, 5, 6])).toBe(40)
+  })
+
+  it('returns 0 for a small straight only', () => {
+    expect(largeStraight([1, 2, 3, 4, 6])).toBe(0)
+  })
+})
+
+describe('kniffel scoring (fixed 50)', () => {
+  const kniffel = scoringFunctions.kniffel
+
+  it('awards 50 for five of a kind', () => {
+    expect(kniffel([5, 5, 5, 5, 5])).toBe(50)
+  })
+
+  it('returns 0 for four of a kind', () => {
+    expect(kniffel([5, 5, 5, 5, 2])).toBe(0)
   })
 })

@@ -128,21 +128,27 @@ mentions S3 and API Gateway:
 | # | Milestone                          | Status  |
 | - | ---------------------------------- | ------- |
 | 0 | Project foundation & app shell     | ✅ done |
-| 1 | Local scoreboard (players, turns)  | ⬜ next |
-| 2 | Tested Kniffel scoring rules       | ⬜      |
-| 3 | Local game persistence             | ⬜      |
+| 1 | Local scoreboard (players, turns)  | ✅ done |
+| 2 | Tested Kniffel scoring rules       | ✅ done |
+| 3 | Local game persistence             | ⬜ next |
 | 4 | User authentication (Cognito)      | ⬜      |
 | 5 | Cloud persistence & sync (AppSync) | ⬜      |
 | 6 | Production deployment (Hosting)    | ⬜      |
 
-## Open rule decisions
+## Rule decisions
 
-Some Kniffel scoring rules vary between house/variant rules. To avoid guessing,
-the following are documented but **not yet implemented** (see the comment block
-in `src/domain/scoring/scoring.ts`):
+This project uses **standard German Kniffel** (documented in the comment block
+in `src/domain/scoring/scoring.ts`). All 13 per-category scorers are implemented
+and tested: full house 25, small/large straight 30/40, Kniffel 50, and the +35
+upper-section bonus at ≥ 63 (applied in the game-scoring module).
 
-- Full house — fixed 25 points vs. sum-of-dice; whether a five-of-a-kind counts.
-- Small / large straight — fixed 30 / 40 points vs. sum-based variants.
-- Kniffel (five of a kind) — fixed 50 points.
-- Kniffel bonus / Joker rule and the upper-section +35 bonus at ≥ 63 (these are
-  game-aggregation rules, deferred to a future game-scoring module).
+**Still deferred** — the **Kniffel bonus / Joker rule** (extra 50 per additional
+Kniffel, and using a surplus Kniffel as a wildcard). It needs per-turn history,
+so it is intentionally not implemented yet.
+
+## How scoring works in the UI
+
+This is a scoreboard, not a dice roller: players roll physical dice and **enter
+the five values** for their turn. The board then shows the score each open
+category would earn, and the active player taps one to fill it. Scratching a
+category (scoring 0) is done by filling it from a roll that earns nothing there.

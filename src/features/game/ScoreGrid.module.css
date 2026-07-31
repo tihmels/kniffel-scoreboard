@@ -1,0 +1,82 @@
+.wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table thead th {
+  text-align: right;
+  font-size: 0.85rem;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+}
+
+.category {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.active {
+  color: var(--accent);
+}
+
+.cell {
+  text-align: right;
+  color: var(--text-h);
+}
+
+.open {
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.fill {
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  min-width: 2.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent-bg, transparent);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.fill:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.fill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.subtotal td,
+.bonus td {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.total td {
+  font-weight: 700;
+  color: var(--text-h);
+  border-bottom: none;
+  border-top: 2px solid var(--border);
+}
