@@ -130,8 +130,8 @@ mentions S3 and API Gateway:
 | 0 | Project foundation & app shell     | ✅ done |
 | 1 | Local scoreboard (players, turns)  | ✅ done |
 | 2 | Tested Kniffel scoring rules       | ✅ done |
-| 3 | Local game persistence             | ⬜ next |
-| 4 | User authentication (Cognito)      | ⬜      |
+| 3 | Local game persistence             | ✅ done |
+| 4 | User authentication (Cognito)      | ⬜ next |
 | 5 | Cloud persistence & sync (AppSync) | ⬜      |
 | 6 | Production deployment (Hosting)    | ⬜      |
 
