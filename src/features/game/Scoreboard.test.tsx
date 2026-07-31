@@ -31,4 +31,21 @@ describe('Scoreboard', () => {
     const threesRow = screen.getByText('Threes').closest('tr')!
     expect(within(threesRow).getByText('9')).toBeInTheDocument()
   })
+
+  it('restores a game in progress after a remount', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<Scoreboard />)
+
+    await user.type(screen.getByLabelText('Player name'), 'Bo')
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await user.click(screen.getByRole('button', { name: /start game/i }))
+    expect(screen.getByText('Now playing:')).toBeInTheDocument()
+
+    unmount()
+    render(<Scoreboard />)
+
+    // The remounted board loads the persisted game rather than the setup screen.
+    expect(screen.getByText('Now playing:')).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Bo' })).toBeInTheDocument()
+  })
 })
