@@ -65,10 +65,13 @@ src/
   components/       Reusable, presentation-focused UI (AppShell, ...)
   features/
     game/           Game-facing feature UI (Scoreboard, ...)
+    auth/           Cognito auth gate (only active when a backend exists)
   domain/
     scoring/        Pure Kniffel scoring logic — no React, no AWS
+    game/           Pure game state + reducer + score selectors
   services/
-    amplify/        AWS/Amplify integration boundary (inert until deployed)
+    amplify/        AWS/Amplify integration boundary (optional backend)
+    storage/        localStorage persistence for the local game
   test/             Test setup (jsdom + jest-dom matchers)
 ```
 
@@ -98,17 +101,32 @@ Amplify Hosting (CDN)  --auth-->  Cognito
 AppSync  -->  DynamoDB
 ```
 
-### AWS actions required later (not done yet)
+### Enabling authentication (requires AWS)
 
-None of these are needed for local frontend work:
+The auth code is already wired up, but it only activates when a backend exists.
+The app **auto-detects** `amplify_outputs.json`:
 
-- Create/authorize an AWS account and configure credentials (`aws configure` or
-  Amplify's credential setup).
-- `npm run amplify:sandbox` — provisions a **personal cloud sandbox** (Cognito,
-  AppSync, DynamoDB) and generates `amplify_outputs.json`.
-- Activate `src/services/amplify/client.ts` (see its comments) to connect the
-  app to the sandbox.
-- For production: connect the repo to **Amplify Hosting** for CI/CD deploys.
+- **No `amplify_outputs.json`** (default) → the app runs in **local mode**: no
+  sign-in, no AWS, and the Amplify SDK is not even loaded (it is code-split into
+  a lazy chunk). This is how ordinary frontend development and CI run.
+- **With `amplify_outputs.json`** → the app wraps itself in the Cognito
+  `Authenticator` and requires sign-in.
+
+To turn it on:
+
+1. Configure AWS credentials (`aws configure`, or Amplify's setup flow).
+2. Run `npm run amplify:sandbox` — provisions a **personal cloud sandbox**
+   (Cognito, AppSync, DynamoDB) and writes `amplify_outputs.json` to the root.
+3. Start `npm run dev`; you should now see the sign-in screen. Stop the sandbox
+   to return to local mode (or delete `amplify_outputs.json`).
+
+For production: connect the repo to **Amplify Hosting** for CI/CD deploys.
+
+> **Dependency note.** Auth uses `@aws-amplify/ui-react`'s `Authenticator`, the
+> component the AWS tutorial uses for sign-in. This is a deliberate exception to
+> the "no large component library" guideline — it is auth-scoped, and it is
+> code-split so it never ships in the local-mode bundle. The rest of the UI
+> remains plain CSS Modules.
 
 Generated files (`amplify_outputs.json`, `.amplify/`) and any `.env` files are
 git-ignored — they contain environment-specific config and must not be committed.
@@ -131,8 +149,8 @@ mentions S3 and API Gateway:
 | 1 | Local scoreboard (players, turns)  | ✅ done |
 | 2 | Tested Kniffel scoring rules       | ✅ done |
 | 3 | Local game persistence             | ✅ done |
-| 4 | User authentication (Cognito)      | ⬜ next |
-| 5 | Cloud persistence & sync (AppSync) | ⬜      |
+| 4 | User authentication (Cognito)      | ✅ done (needs sandbox to see live) |
+| 5 | Cloud persistence & sync (AppSync) | ⬜ next |
 | 6 | Production deployment (Hosting)    | ⬜      |
 
 ## Rule decisions

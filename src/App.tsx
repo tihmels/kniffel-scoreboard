@@ -1,11 +1,11 @@
-import { AppShell } from './components/AppShell/AppShell'
+import { AuthGate } from './features/auth/AuthGate'
 import { Scoreboard } from './features/game/Scoreboard'
 
 function App() {
   return (
-    <AppShell>
+    <AuthGate>
       <Scoreboard />
-    </AppShell>
+    </AuthGate>
   )
 }
 

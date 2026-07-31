@@ -38,13 +38,11 @@
   font-weight: 600;
 }
 
-.tag {
+.actions {
   margin-left: auto;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.15rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .main {
