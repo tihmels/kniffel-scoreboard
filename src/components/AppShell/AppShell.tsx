@@ -3,9 +3,11 @@ import styles from './AppShell.module.css'
 
 interface AppShellProps {
   children: ReactNode
+  /** Optional content shown on the right of the header (e.g. auth controls). */
+  headerActions?: ReactNode
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, headerActions }: AppShellProps) {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
@@ -14,7 +16,9 @@ export function AppShell({ children }: AppShellProps) {
             🎲
           </span>
           <span className={styles.title}>Kniffel Scoreboard</span>
-          <span className={styles.tag}>Local · Milestone 1</span>
+          {headerActions && (
+            <span className={styles.actions}>{headerActions}</span>
+          )}
         </div>
       </header>
 

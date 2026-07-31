@@ -19,6 +19,11 @@ AppSync, DynamoDB). npm only. Node LTS (`.nvmrc`, `engines >= 20.19`).
 Do **not** introduce: Next.js, Redux, a component library, containers, a
 monorepo, an extra backend framework, or a second package manager.
 
+The one standing exception is `@aws-amplify/ui-react`, used solely for the
+Cognito `Authenticator` (the component the AWS tutorial uses). It is
+auth-scoped and code-split — it is not a licence to build the rest of the UI
+from it. All other UI stays plain CSS Modules.
+
 ## Commands
 
 ```bash
@@ -38,28 +43,47 @@ real output. Do not assert success without it.
 ```
 src/
   components/    Reusable presentational UI (CSS Modules)
-  features/game/ Game-facing feature UI
+  features/
+    game/        Game-facing feature UI
+    auth/        Cognito auth gate (active only when a backend exists)
   domain/        PURE TypeScript rules — no React, no AWS imports
-    scoring/
+    scoring/     Per-category scoring functions
+    game/        Game state + reducer + score selectors (incl. upper bonus)
   services/      The ONLY layer allowed to touch AWS/Amplify
-    amplify/
+    amplify/     Amplify integration boundary
+    storage/     localStorage persistence for the local game
+  test/          Vitest setup (jsdom + jest-dom)
 amplify/         Amplify Gen 2 backend (auth + data)
 ```
 
 - Keep `domain/` free of React and AWS. UI depends on the domain, never the
   reverse. All cloud access goes through `services/amplify`.
-- `services/amplify/client.ts` is intentionally **inert**: local development
-  must not require AWS credentials or a deployed backend. Do not wire it up
-  until an Amplify sandbox exists.
+- **Local mode must stay credential-free.** `services/amplify/client.ts` loads
+  the git-ignored `amplify_outputs.json` optionally via `import.meta.glob` and
+  exports only `amplifyOutputs` / `hasAmplifyBackend`. It deliberately does not
+  import `aws-amplify`, so the local-mode bundle ships without the SDK;
+  `Amplify.configure` happens in the lazily-loaded
+  `features/auth/AuthenticatedApp.tsx` chunk. Preserve that split — never import
+  `aws-amplify` from a module reachable from the local-mode entry path.
+- There is no generated AppSync data client yet. Cloud reads/writes belong in
+  `services/amplify`, behind `hasAmplifyBackend`, so the app keeps working with
+  no backend.
 
 ## Kniffel scoring — do not guess rule variants
 
-Only the unambiguous categories are implemented (upper section,
-three/four-of-a-kind, chance). `scoringFunctions` is a `Partial<Record<...>>`;
-variant-dependent categories (full house, straights, Kniffel, the Kniffel/Joker
-bonus, the ≥63 upper bonus) are **deliberately unimplemented** and documented in
-`src/domain/scoring/scoring.ts` and the README. When implementing them, get an
-explicit rule decision first; a test asserts they stay absent until then.
+The project uses **standard German Kniffel**, recorded in the RULE DECISIONS
+comment block at the bottom of `src/domain/scoring/scoring.ts`. That block is the
+source of truth — read it before touching scoring.
+
+All 13 per-category scorers are implemented and tested: `scoringFunctions` is a
+complete `Record<ScoreCategory, ScoringFunction>` (full house 25, small/large
+straight 30/40, Kniffel 50). The +35 upper-section bonus at ≥ 63 is an
+aggregation rule and lives in `src/domain/game/gameState.ts`, not in `scoring/`.
+
+**Still deferred:** the Kniffel bonus / Joker rule (+50 per additional Kniffel,
+and using a surplus Kniffel as a wildcard). It needs per-turn history, which the
+current state shape does not carry. Do not implement it — or any other rule
+variant — without an explicit rule decision from the user first.
 
 ## Conventions
 
