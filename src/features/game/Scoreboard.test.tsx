@@ -23,6 +23,29 @@ async function startGameWith(names: string[]) {
   return { user, unmount: view.unmount }
 }
 
+/** Every category, in screen order. Scratching each one plays a game out. */
+const CATEGORIES = [
+  'Einser',
+  'Zweier',
+  'Dreier',
+  'Vierer',
+  'Fünfer',
+  'Sechser',
+  'Dreierpasch',
+  'Viererpasch',
+  'Full House',
+  'Kleine Straße',
+  'Große Straße',
+  'Kniffel',
+  'Chance',
+]
+
+async function scratchEveryCategory(user: ReturnType<typeof userEvent.setup>) {
+  for (const label of CATEGORIES) {
+    await user.click(screen.getByRole('button', { name: `${label} streichen` }))
+  }
+}
+
 describe('Scoreboard', () => {
   it('scores an upper category in a single tap', async () => {
     const { user } = await startGameWith(['Ann'])
@@ -103,6 +126,59 @@ describe('Scoreboard', () => {
     // Stepping back to Ann is a hint change, not a rule violation.
     await user.click(screen.getByRole('button', { name: 'Vorheriger Spieler' }))
     expect(screen.getByText('Ann ist dran')).toBeInTheDocument()
+  })
+
+  it('ends a running game and discards it', async () => {
+    const { user } = await startGameWith(['Ann'])
+    await user.click(
+      screen.getByRole('button', { name: '3 × Dreier, 9 Punkte' }),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Beenden' }))
+    await user.click(
+      screen.getByRole('button', { name: 'Beenden und verwerfen' }),
+    )
+
+    expect(
+      screen.getByRole('button', { name: 'Spiel starten' }),
+    ).toBeInTheDocument()
+    // Discarded, so it never reaches the history — there is nothing to open.
+    expect(
+      screen.queryByRole('button', { name: 'Letzte Spiele' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('keeps the game when ending it is cancelled', async () => {
+    const { user } = await startGameWith(['Ann'])
+
+    await user.click(screen.getByRole('button', { name: 'Beenden' }))
+    await user.click(screen.getByRole('button', { name: 'Weiterspielen' }))
+
+    expect(screen.getByText('Ann ist dran')).toBeInTheDocument()
+  })
+
+  it('archives a game played to the last category', async () => {
+    const { user } = await startGameWith(['Ann'])
+    await scratchEveryCategory(user)
+
+    await user.click(screen.getByRole('button', { name: 'Neues Spiel' }))
+    await user.click(screen.getByRole('button', { name: 'Letzte Spiele' }))
+
+    expect(screen.getByText('Ann gewinnt')).toBeInTheDocument()
+  })
+
+  it('reopens an archived card as a read-only sheet', async () => {
+    const { user } = await startGameWith(['Ann'])
+    await scratchEveryCategory(user)
+    await user.click(screen.getByRole('button', { name: 'Neues Spiel' }))
+    await user.click(screen.getByRole('button', { name: 'Letzte Spiele' }))
+
+    await user.click(screen.getByRole('button', { name: /Ann gewinnt/ }))
+
+    expect(screen.getByRole('columnheader', { name: 'AN' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('rowheader', { name: 'Gesamt' }),
+    ).toBeInTheDocument()
   })
 
   it('restores a game in progress after a remount', async () => {

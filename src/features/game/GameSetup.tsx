@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import type { Dispatch } from 'react'
 import type { GameAction, GameState } from '../../domain/game'
-import { loadRecentNames } from '../../services/storage'
+import { loadHistory, loadRecentNames } from '../../services/storage'
 import { AppBar } from './AppBar'
+import { HistoryScreen } from './HistoryScreen'
 import styles from './GameSetup.module.css'
 
 /** Kniffel stays sociable at this size; beyond it the standings strip breaks up. */
@@ -21,6 +22,8 @@ export function GameSetup({ state, dispatch }: GameSetupProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
   const [recent] = useState(loadRecentNames)
+  const [played] = useState(loadHistory)
+  const [showHistory, setShowHistory] = useState(false)
 
   const taken = new Set(state.players.map((player) => player.name))
   const suggestions = recent.filter((name) => !taken.has(name))
@@ -38,9 +41,26 @@ export function GameSetup({ state, dispatch }: GameSetupProps) {
     setEditingId(null)
   }
 
+  if (showHistory) {
+    return <HistoryScreen onClose={() => setShowHistory(false)} />
+  }
+
   return (
     <div className={styles.screen}>
-      <AppBar title="Neues Spiel" />
+      <AppBar
+        title="Neues Spiel"
+        actions={
+          played.length > 0 && (
+            <button
+              type="button"
+              className={styles.history}
+              onClick={() => setShowHistory(true)}
+            >
+              Letzte Spiele
+            </button>
+          )
+        }
+      />
 
       <div className={styles.body}>
         {suggestions.length > 0 && (

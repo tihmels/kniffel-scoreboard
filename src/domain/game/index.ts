@@ -5,6 +5,7 @@ export type {
   ScoreEntry,
   GameStatus,
   GameState,
+  GameRecord,
   GameAction,
   BonusState,
 } from './types'
@@ -28,4 +29,6 @@ export {
   winners,
   standings,
   leader,
+  toGameRecord,
+  fromGameRecord,
 } from './gameState'

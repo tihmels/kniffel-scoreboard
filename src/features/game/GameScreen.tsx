@@ -20,6 +20,7 @@ import {
 import type { ScoreCategory, UpperCategory } from '../../domain/scoring'
 import { AppBar } from './AppBar'
 import { CategoryRow } from './CategoryRow'
+import { EndGameSheet } from './EndGameSheet'
 import { CATEGORY_LABELS } from './labels'
 import { OverviewScreen } from './OverviewScreen'
 import { SectionCard } from './SectionCard'
@@ -48,6 +49,7 @@ export function GameScreen({ state, dispatch }: GameScreenProps) {
   const [editing, setEditing] = useState<ScoreCategory | null>(null)
   const [sheetCategory, setSheetCategory] = useState<ScoreCategory | null>(null)
   const [showOverview, setShowOverview] = useState(false)
+  const [endingGame, setEndingGame] = useState(false)
   const [dismissed, setDismissed] = useState<ScoreEntry | null>(null)
 
   const player = state.players[state.activePlayerIndex]
@@ -142,6 +144,15 @@ export function GameScreen({ state, dispatch }: GameScreenProps) {
         title={`Runde ${currentRound(state)}`}
         detail={`von ${TOTAL_ROUNDS}`}
         onUndo={state.lastEntry ? () => dispatch({ type: 'undo' }) : undefined}
+        actions={
+          <button
+            type="button"
+            className={styles.end}
+            onClick={() => setEndingGame(true)}
+          >
+            Beenden
+          </button>
+        }
       />
 
       <StandingsStrip
@@ -198,6 +209,13 @@ export function GameScreen({ state, dispatch }: GameScreenProps) {
           Gesamtübersicht
         </button>
       </div>
+
+      {endingGame && (
+        <EndGameSheet
+          onConfirm={() => dispatch({ type: 'reset' })}
+          onClose={() => setEndingGame(false)}
+        />
+      )}
 
       {sheetCategory && (
         <SumSheet

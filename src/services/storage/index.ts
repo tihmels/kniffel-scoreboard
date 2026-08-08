@@ -4,4 +4,6 @@ export {
   clearGame,
   loadRecentNames,
   rememberNames,
+  loadHistory,
+  rememberFinishedGame,
 } from './gameStorage'

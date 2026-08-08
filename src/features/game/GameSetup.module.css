@@ -13,6 +13,23 @@
   padding: 1rem;
 }
 
+.history {
+  height: 36px;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.history:hover {
+  border-color: var(--accent);
+}
+
 .block {
   display: flex;
   flex-direction: column;

@@ -6,15 +6,21 @@ import styles from './OverviewScreen.module.css'
 
 interface OverviewScreenProps {
   state: GameState
+  /** Names the sheet being read; a history entry passes its date instead. */
+  title?: string
   onClose: () => void
 }
 
 /** The whole sheet, for when someone wants to study the standings. */
-export function OverviewScreen({ state, onClose }: OverviewScreenProps) {
+export function OverviewScreen({
+  state,
+  title = 'Gesamtübersicht',
+  onClose,
+}: OverviewScreenProps) {
   return (
     <div className={styles.screen}>
       <AppBar
-        title="Gesamtübersicht"
+        title={title}
         actions={
           <button type="button" className={styles.done} onClick={onClose}>
             Fertig

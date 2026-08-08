@@ -6,6 +6,24 @@
   padding-bottom: calc(76px + env(safe-area-inset-bottom));
 }
 
+.end {
+  height: 36px;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.end:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .bottomBar {
   position: fixed;
   left: 0;

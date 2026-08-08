@@ -1,4 +1,4 @@
-import type { GameState, GameStatus } from '../../domain/game'
+import type { GameRecord, GameState, GameStatus } from '../../domain/game'
 
 /**
  * Persists the local game to `localStorage`. This is the browser-only
@@ -12,7 +12,13 @@ const STORAGE_KEY = 'kniffel-scoreboard:game:v2'
 /** Names offered as one-tap chips at setup, since groups replay together. */
 const NAMES_KEY = 'kniffel-scoreboard:names:v1'
 
+/** Games played to the end, newest first. */
+const HISTORY_KEY = 'kniffel-scoreboard:history:v1'
+
 const MAX_REMEMBERED_NAMES = 8
+
+/** A games night's worth, so the list cannot grow without bound. */
+const MAX_HISTORY = 25
 
 const VALID_STATUSES: readonly GameStatus[] = ['setup', 'playing', 'finished']
 
@@ -75,6 +81,49 @@ export function clearGame(): void {
     storage.removeItem(STORAGE_KEY)
   } catch {
     // no-op
+  }
+}
+
+/** Narrow unknown parsed JSON to a plausible history entry. */
+function isGameRecord(value: unknown): value is GameRecord {
+  if (typeof value !== 'object' || value === null) return false
+  const candidate = value as Record<string, unknown>
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.finishedAt === 'string' &&
+    Array.isArray(candidate.players) &&
+    typeof candidate.scores === 'object' &&
+    candidate.scores !== null
+  )
+}
+
+/** Finished games, newest first. Unreadable entries are dropped, not fatal. */
+export function loadHistory(): GameRecord[] {
+  const storage = getStorage()
+  if (!storage) return []
+
+  const raw = storage.getItem(HISTORY_KEY)
+  if (raw === null) return []
+
+  try {
+    const parsed: unknown = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed.filter(isGameRecord) : []
+  } catch {
+    return []
+  }
+}
+
+/** Add a played-out game to the front of the history. */
+export function rememberFinishedGame(record: GameRecord): void {
+  const storage = getStorage()
+  if (!storage) return
+
+  const next = [record, ...loadHistory()].slice(0, MAX_HISTORY)
+
+  try {
+    storage.setItem(HISTORY_KEY, JSON.stringify(next))
+  } catch {
+    // Archiving is best-effort; a full quota must never break the game.
   }
 }
 

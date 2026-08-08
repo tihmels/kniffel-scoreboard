@@ -1,9 +1,10 @@
-import { useEffect, useReducer } from 'react'
-import { gameReducer, initialGameState } from '../../domain/game'
+import { useEffect, useReducer, useRef } from 'react'
+import { gameReducer, initialGameState, toGameRecord } from '../../domain/game'
 import type { GameState } from '../../domain/game'
 import {
   clearGame,
   loadGame,
+  rememberFinishedGame,
   rememberNames,
   saveGame,
 } from '../../services/storage'
@@ -22,6 +23,21 @@ export function useKniffelGame() {
     } else {
       saveGame(state)
     }
+  }, [state])
+
+  // Filling the last cell is the one moment a game is worth archiving, and it
+  // happens exactly once: the standings screen offers no undo, so `finished` is
+  // terminal until a rematch or a new game starts the cycle over. A game
+  // restored from storage was already archived when it finished.
+  const archived = useRef(state.status === 'finished')
+  useEffect(() => {
+    if (state.status !== 'finished') {
+      archived.current = false
+      return
+    }
+    if (archived.current) return
+    archived.current = true
+    rememberFinishedGame(toGameRecord(state))
   }, [state])
 
   // Names are worth keeping past the game itself: the same group plays again,

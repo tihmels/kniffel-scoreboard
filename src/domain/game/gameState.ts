@@ -13,6 +13,7 @@ import type { ScoreCategory, UpperCategory } from '../scoring'
 import type {
   BonusState,
   GameAction,
+  GameRecord,
   GameState,
   Player,
   PlayerId,
@@ -165,6 +166,31 @@ export function standings(state: GameState): Player[] {
 export function leader(state: GameState): Player | undefined {
   const best = winners(state)
   return best.length === 1 ? best[0] : undefined
+}
+
+/** Snapshot a played-out game for the history list. */
+export function toGameRecord(state: GameState): GameRecord {
+  return {
+    id: crypto.randomUUID(),
+    finishedAt: new Date().toISOString(),
+    players: state.players,
+    scores: state.scores,
+  }
+}
+
+/**
+ * Re-hydrate a history entry into the shape the read-only views want. The
+ * active index is deliberately out of range: nobody is up in a finished game,
+ * and the grid accents whoever it believes is.
+ */
+export function fromGameRecord(record: GameRecord): GameState {
+  return {
+    status: 'finished',
+    players: record.players,
+    scores: record.scores,
+    activePlayerIndex: -1,
+    lastEntry: null,
+  }
 }
 
 function playerIndex(state: GameState, playerId: PlayerId): number {

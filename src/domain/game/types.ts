@@ -41,6 +41,20 @@ export interface GameState {
   lastEntry: ScoreEntry | null
 }
 
+/**
+ * A game played to its last category, kept for the history list. Only the raw
+ * cards are stored: totals, winners and standings stay derived, so a change to
+ * the scoring rules never leaves the archive disagreeing with the live game.
+ * Ending a game early records nothing — it is discarded on purpose.
+ */
+export interface GameRecord {
+  id: string
+  /** ISO timestamp of the moment the last cell was filled. */
+  finishedAt: string
+  players: Player[]
+  scores: Record<PlayerId, ScoreCard>
+}
+
 /** How far a player is from the +35 upper-section bonus. */
 export type BonusState = 'undetermined' | 'reachable' | 'secured' | 'missed'
 

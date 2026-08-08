@@ -1,0 +1,88 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  background: rgba(8, 6, 13, 0.42);
+  cursor: pointer;
+}
+
+.sheet {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  padding: 0.75rem 1rem calc(1.25rem + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  box-shadow: rgba(0, 0, 0, 0.18) 0 -8px 32px -12px;
+}
+
+.handle {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 0.875rem;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.title {
+  margin: 0 0 0.5rem;
+  font-size: 1.1875rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.text {
+  margin-bottom: 1.125rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cancel,
+.confirm {
+  height: 48px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cancel {
+  flex: 1;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* The discarding one carries the weight, but stays a plain button: this is a
+   scorepad, not a system alert, and red would outrank everything on screen. */
+.confirm {
+  flex: 1.4;
+  color: var(--accent-contrast);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.cancel:hover {
+  border-color: var(--accent);
+}
+
+.confirm:hover {
+  opacity: 0.88;
+}
