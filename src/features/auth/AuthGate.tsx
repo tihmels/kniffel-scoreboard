@@ -2,7 +2,6 @@ import { Suspense, lazy } from 'react'
 import type { ReactNode } from 'react'
 import { AppShell } from '../../components/AppShell/AppShell'
 import { hasAmplifyBackend } from '../../services/amplify/client'
-import styles from './AuthGate.module.css'
 
 // Loaded only when a backend is configured, keeping the Amplify SDK out of the
 // local-mode bundle entirely.
@@ -18,14 +17,9 @@ interface AuthGateProps {
  * renders in local-only mode, so frontend development never requires AWS.
  */
 export function AuthGate({ children }: AuthGateProps) {
+  // No bar at all in local mode: the game's own AppBar is the only chrome.
   if (!hasAmplifyBackend) {
-    return (
-      <AppShell
-        headerActions={<span className={styles.badge}>Local mode</span>}
-      >
-        {children}
-      </AppShell>
-    )
+    return <AppShell>{children}</AppShell>
   }
 
   return (

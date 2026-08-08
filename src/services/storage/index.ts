@@ -1,1 +1,7 @@
-export { loadGame, saveGame, clearGame } from './gameStorage'
+export {
+  loadGame,
+  saveGame,
+  clearGame,
+  loadRecentNames,
+  rememberNames,
+} from './gameStorage'

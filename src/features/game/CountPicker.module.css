@@ -1,0 +1,59 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.cell {
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.cell:hover {
+  border-color: var(--accent);
+}
+
+.scratch {
+  gap: 2px;
+  background: var(--surface-sub);
+  border: 1px dashed var(--border-dashed);
+}
+
+.count {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-h);
+}
+
+.points {
+  font: 500 0.625rem/1 var(--mono);
+  color: var(--text-muted);
+}
+
+.scratch .points {
+  font-weight: 600;
+  font-size: 0.5625rem;
+}
+
+.selected {
+  background: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.selected .count {
+  color: var(--accent-contrast);
+}
+
+.selected .points {
+  color: var(--accent-contrast);
+  opacity: 0.75;
+}

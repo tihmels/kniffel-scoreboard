@@ -64,10 +64,10 @@ public/             Static assets served as-is
 src/
   components/       Reusable, presentation-focused UI (AppShell, ...)
   features/
-    game/           Game-facing feature UI (Scoreboard, ...)
+    game/           The scorepad: setup, play, entry controls, overview, result
     auth/           Cognito auth gate (only active when a backend exists)
   domain/
-    scoring/        Pure Kniffel scoring logic — no React, no AWS
+    scoring/        Categories, the score-entry model, Kniffel scoring rules
     game/           Pure game state + reducer + score selectors
   services/
     amplify/        AWS/Amplify integration boundary (optional backend)
@@ -150,8 +150,9 @@ mentions S3 and API Gateway:
 | 2 | Tested Kniffel scoring rules       | ✅ done |
 | 3 | Local game persistence             | ✅ done |
 | 4 | User authentication (Cognito)      | ✅ done (needs sandbox to see live) |
-| 5 | Cloud persistence & sync (AppSync) | ⬜ next |
-| 6 | Production deployment (Hosting)    | ⬜      |
+| 5 | Mobile-first scorepad UI           | ✅ done |
+| 6 | Cloud persistence & sync (AppSync) | ⬜ next |
+| 7 | Production deployment (Hosting)    | ⬜      |
 
 ## Rule decisions
 
@@ -166,7 +167,31 @@ so it is intentionally not implemented yet.
 
 ## How scoring works in the UI
 
-This is a scoreboard, not a dice roller: players roll physical dice and **enter
-the five values** for their turn. The board then shows the score each open
-category would earn, and the active player taps one to fill it. Scratching a
-category (scoring 0) is done by filling it from a roll that earns nothing there.
+This is a scorepad, not a dice roller. Players roll physical dice, announce what
+they scored, and the person holding the phone taps it in. The app never asks what
+was rolled.
+
+That works because every Kniffel score comes from a small, enumerable set, so
+there are only three controls and **no keyboard anywhere except player names**:
+
+| Categories                                       | Input                            | Taps |
+| ------------------------------------------------ | -------------------------------- | ---- |
+| Einser … Sechser                                 | how many dice showed that face, 0–5 | 1 |
+| Full House 25, Kleine/Große Straße 30/40, Kniffel 50 | scored or scratched           | 1 |
+| Dreierpasch, Viererpasch, Chance                 | the sum, 5–30, from a sheet       | 2 |
+
+Roughly 1.2 taps per entry, and **scratching costs exactly the same as scoring** —
+it is the leftmost target of every control, not a separate gesture.
+
+Three things follow from treating this as a scorepad rather than a game engine:
+
+- **Turn order is a hint.** The app predicts who is next and highlights them, but
+  any player's card can be filled at any time. Forgetting a turn never locks you out.
+- **Correcting is normal.** Every filled row stays tappable, and the last entry can
+  be undone from the bar or the toast. On paper you just cross it out.
+- **A scratched category looks different from an open one** — the paper slash
+  versus a blank. Confusing the two is the classic scorepad error.
+
+The +35 bonus at 63 in the upper section gets its own live readout per player
+("noch 10", "+35 sicher", "verpasst"), plus a per-row hint naming the count that
+would secure it. It is the one number a paper pad cannot tell you.

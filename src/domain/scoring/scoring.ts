@@ -1,19 +1,10 @@
+import { UPPER_FACE } from './categories'
 import type {
   DiceRoll,
   DieValue,
   ScoreCategory,
   ScoringFunction,
-  UpperCategory,
 } from './types'
-
-const UPPER_FACES: Record<UpperCategory, DieValue> = {
-  ones: 1,
-  twos: 2,
-  threes: 3,
-  fours: 4,
-  fives: 5,
-  sixes: 6,
-}
 
 /** Sum of all five dice. */
 export function sumDice(dice: DiceRoll): number {
@@ -107,12 +98,12 @@ export const scoreChance: ScoringFunction = (dice) => sumDice(dice)
  * Rule variant: STANDARD GERMAN KNIFFEL (see RULE DECISIONS below).
  */
 export const scoringFunctions: Record<ScoreCategory, ScoringFunction> = {
-  ones: (dice) => scoreUpperSection(dice, UPPER_FACES.ones),
-  twos: (dice) => scoreUpperSection(dice, UPPER_FACES.twos),
-  threes: (dice) => scoreUpperSection(dice, UPPER_FACES.threes),
-  fours: (dice) => scoreUpperSection(dice, UPPER_FACES.fours),
-  fives: (dice) => scoreUpperSection(dice, UPPER_FACES.fives),
-  sixes: (dice) => scoreUpperSection(dice, UPPER_FACES.sixes),
+  ones: (dice) => scoreUpperSection(dice, UPPER_FACE.ones),
+  twos: (dice) => scoreUpperSection(dice, UPPER_FACE.twos),
+  threes: (dice) => scoreUpperSection(dice, UPPER_FACE.threes),
+  fours: (dice) => scoreUpperSection(dice, UPPER_FACE.fours),
+  fives: (dice) => scoreUpperSection(dice, UPPER_FACE.fives),
+  sixes: (dice) => scoreUpperSection(dice, UPPER_FACE.sixes),
   threeOfAKind: scoreNOfAKind(3),
   fourOfAKind: scoreNOfAKind(4),
   fullHouse: scoreFullHouse,

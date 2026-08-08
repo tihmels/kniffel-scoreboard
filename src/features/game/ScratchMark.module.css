@@ -1,0 +1,21 @@
+.mark {
+  display: inline-block;
+  flex: none;
+  width: 22px;
+  height: 15px;
+  border-radius: 3px;
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 1px),
+    var(--scratch-ink) calc(50% - 1px),
+    var(--scratch-ink) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+}
+
+.boxed {
+  width: 30px;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}

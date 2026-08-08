@@ -3,32 +3,24 @@ import styles from './AppShell.module.css'
 
 interface AppShellProps {
   children: ReactNode
-  /** Optional content shown on the right of the header (e.g. auth controls). */
+  /** Auth controls, when a backend is wired up. Absent in local mode. */
   headerActions?: ReactNode
 }
 
+/**
+ * Frame around the app. Deliberately chrome-free: the game screens carry their
+ * own 44px AppBar, and vertical space on a phone belongs to the scorepad. The
+ * bar below appears only when there is something to put in it (auth controls).
+ */
 export function AppShell({ children, headerActions }: AppShellProps) {
   return (
     <div className={styles.shell}>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <span className={styles.logo} aria-hidden="true">
-            🎲
-          </span>
-          <span className={styles.title}>Kniffel Scoreboard</span>
-          {headerActions && (
-            <span className={styles.actions}>{headerActions}</span>
-          )}
-        </div>
-      </header>
-
+      {headerActions && (
+        <header className={styles.header}>
+          <span className={styles.actions}>{headerActions}</span>
+        </header>
+      )}
       <main className={styles.main}>{children}</main>
-
-      <footer className={styles.footer}>
-        <div className={styles.footerInner}>
-          A learning project · React · TypeScript · AWS Amplify
-        </div>
-      </footer>
     </div>
   )
 }

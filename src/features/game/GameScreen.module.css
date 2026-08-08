@@ -1,0 +1,69 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background: var(--bg);
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem calc(1.25rem + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.secondary,
+.primary {
+  height: 48px;
+  font-size: 0.9375rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.secondary {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.primary {
+  flex: 1.4;
+  font-weight: 700;
+  color: var(--text-h);
+  background: var(--bg);
+}
+
+.secondary:hover:not(:disabled),
+.primary:hover {
+  border-color: var(--accent);
+}
+
+/* From 900px the sheet no longer has to be a separate screen: entry on the
+   left, the full grid permanently on the right. */
+@media (min-width: 900px) {
+  .screen {
+    padding-bottom: 0;
+  }
+
+  .bottomBar {
+    position: static;
+    max-width: 520px;
+    padding-bottom: 1.25rem;
+    border-top: none;
+    background: transparent;
+  }
+}

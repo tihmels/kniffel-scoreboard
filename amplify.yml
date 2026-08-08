@@ -1,0 +1,26 @@
+# AWS Amplify Hosting build settings.
+#
+# Frontend only, on purpose. There is no `backend:` phase, so Amplify never runs
+# `ampx pipeline-deploy` and no `amplify_outputs.json` is generated at build
+# time. That keeps the deployed app in local mode: no Cognito, no sign-in, and
+# the Amplify SDK stays out of the shipped bundle. The `amplify/` directory is
+# still in the repo for the later cloud-persistence milestone — adding a
+# `backend:` phase here is what would switch sign-in on.
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # The build image ships several Node versions; package.json needs >= 20.19.
+        - nvm use 22 || nvm install 22
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
