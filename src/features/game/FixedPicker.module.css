@@ -27,9 +27,13 @@
   border-color: var(--accent);
 }
 
+/* The grow factor only bites when this row is the full-width one (an open edit).
+   Inline in a category row the wrapper shrink-wraps, so the width floor is what
+   keeps a bare "50" from collapsing to the width of its two digits. */
 .value,
 .sheet {
-  flex: 1.5;
+  flex: 1.15;
+  min-width: 88px;
   height: 48px;
   font-size: 0.9375rem;
   font-weight: 700;
