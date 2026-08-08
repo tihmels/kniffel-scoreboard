@@ -23,9 +23,6 @@ export function TurnHeader({ name, onPrevious, onNext }: TurnHeaderProps) {
       </button>
       <div className={styles.who}>
         <div className={styles.name}>{name} ist dran</div>
-        <div className={styles.hint}>
-          Kategorie antippen — Wert direkt daneben
-        </div>
       </div>
       <button
         type="button"

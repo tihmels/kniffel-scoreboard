@@ -36,8 +36,3 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.hint {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
