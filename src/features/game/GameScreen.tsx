@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Dispatch } from 'react'
 import {
   TOTAL_ROUNDS,
@@ -52,6 +52,15 @@ export function GameScreen({ state, dispatch }: GameScreenProps) {
 
   const player = state.players[state.activePlayerIndex]
   const card = player ? (state.scores[player.id] ?? {}) : {}
+
+  // After an entry the turn moves on, but the eye is still at the row that was
+  // just filled — well below the name of whoever is up next.
+  const previousPlayerIndex = useRef(state.activePlayerIndex)
+  useEffect(() => {
+    if (previousPlayerIndex.current === state.activePlayerIndex) return
+    previousPlayerIndex.current = state.activePlayerIndex
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [state.activePlayerIndex])
 
   if (showOverview) {
     return (
@@ -145,6 +154,7 @@ export function GameScreen({ state, dispatch }: GameScreenProps) {
       />
 
       <TurnHeader
+        key={player.id}
         name={player.name}
         onPrevious={() => moveActive(-1)}
         onNext={() => moveActive(1)}

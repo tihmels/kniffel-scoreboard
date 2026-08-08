@@ -1,8 +1,22 @@
+/* Remounted on every player change (keyed by player id), so both animations
+   replay and the handover is visible even when the names look alike. */
 .header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem 0.625rem;
+  border-radius: var(--radius);
+  animation: wash 900ms ease-out;
+}
+
+@keyframes wash {
+  0%,
+  35% {
+    background: var(--accent-wash);
+  }
+  100% {
+    background: transparent;
+  }
 }
 
 .step {
@@ -35,4 +49,25 @@
   color: var(--text-h);
   overflow: hidden;
   text-overflow: ellipsis;
+  animation: handover 500ms ease-out;
+}
+
+@keyframes handover {
+  from {
+    color: var(--accent);
+    transform: translateY(-0.375rem);
+    opacity: 0;
+  }
+  to {
+    color: var(--text-h);
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .name {
+    animation: none;
+  }
 }

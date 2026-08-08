@@ -28,6 +28,9 @@ Object.defineProperty(window, 'localStorage', {
   writable: true,
 })
 
+// jsdom has no layout, so scrollTo is unimplemented and only logs a warning.
+window.scrollTo = () => {}
+
 afterEach(() => {
   cleanup()
   window.localStorage.clear()
