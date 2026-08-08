@@ -7,7 +7,12 @@ import type { GameState, GameStatus } from '../../domain/game'
  * The key is versioned so an incompatible future shape is ignored rather than
  * crashing an old save into new code.
  */
-const STORAGE_KEY = 'kniffel-scoreboard:game:v1'
+const STORAGE_KEY = 'kniffel-scoreboard:game:v2'
+
+/** Names offered as one-tap chips at setup, since groups replay together. */
+const NAMES_KEY = 'kniffel-scoreboard:names:v1'
+
+const MAX_REMEMBERED_NAMES = 8
 
 const VALID_STATUSES: readonly GameStatus[] = ['setup', 'playing', 'finished']
 
@@ -70,5 +75,39 @@ export function clearGame(): void {
     storage.removeItem(STORAGE_KEY)
   } catch {
     // no-op
+  }
+}
+
+/** Previously used player names, most recent first. */
+export function loadRecentNames(): string[] {
+  const storage = getStorage()
+  if (!storage) return []
+
+  const raw = storage.getItem(NAMES_KEY)
+  if (raw === null) return []
+
+  try {
+    const parsed: unknown = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((name): name is string => typeof name === 'string')
+  } catch {
+    return []
+  }
+}
+
+/** Remember `names`, most recent first, without duplicates. */
+export function rememberNames(names: readonly string[]): void {
+  const storage = getStorage()
+  if (!storage) return
+
+  const merged = [...names, ...loadRecentNames()]
+    .map((name) => name.trim())
+    .filter((name) => name !== '')
+  const unique = [...new Set(merged)].slice(0, MAX_REMEMBERED_NAMES)
+
+  try {
+    storage.setItem(NAMES_KEY, JSON.stringify(unique))
+  } catch {
+    // Best-effort convenience; never let it break setup.
   }
 }

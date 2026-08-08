@@ -31,3 +31,10 @@ export type ScoreCategory = UpperCategory | LowerCategory
  * `0` when the roll does not satisfy the category. It never mutates its input.
  */
 export type ScoringFunction = (dice: DiceRoll) => number
+
+/**
+ * The shape of input a category needs when a score is recorded by hand:
+ * `count` for the upper section (0–5 dice of one face), `fixed` for categories
+ * worth a set number of points, `sum` for the sum-of-all-dice categories.
+ */
+export type CategoryInputKind = 'count' | 'fixed' | 'sum'

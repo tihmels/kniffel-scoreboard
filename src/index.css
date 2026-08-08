@@ -8,11 +8,27 @@
   --accent: #7c3aed;
   --accent-contrast: #ffffff;
 
+  /* Scorepad surfaces: a quieter fill for section headers and scratch targets,
+     and a lighter rule for the many row dividers inside a card. */
+  --surface-sub: #faf9f7;
+  --border-soft: #f0eff2;
+  --border-dashed: #cfcdd4;
+  --text-faint: #b9b4c2;
+  --accent-wash: #f6f1ff;
+  --accent-track: #e2d7fb;
+  --track: #ecebee;
+  --success: #2f7d5d;
+  --success-border: #cbe3d7;
+  --scratch-ink: #b9b4c2;
+
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   --radius: 12px;
   --shadow: rgba(0, 0, 0, 0.06) 0 4px 12px -2px;
+
+  /* One-handed use: every target a thumb must hit is at least this tall. */
+  --tap: 44px;
 
   font: 16px/1.5 var(--sans);
   color-scheme: light dark;
@@ -35,6 +51,17 @@
     --accent: #a78bfa;
     --accent-contrast: #17151f;
     --shadow: rgba(0, 0, 0, 0.4) 0 4px 12px -2px;
+
+    --surface-sub: #171820;
+    --border-soft: #24262f;
+    --border-dashed: #4a4c58;
+    --text-faint: #5a5766;
+    --accent-wash: #241f36;
+    --accent-track: #3c3357;
+    --track: #2e303a;
+    --success: #5fb894;
+    --success-border: #2c4a3d;
+    --scratch-ink: #6b6a78;
   }
 }
 
@@ -59,4 +86,15 @@ h3 {
 
 p {
   margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+/* One focus ring for the whole app: the score entry is nothing but buttons. */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
