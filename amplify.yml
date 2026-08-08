@@ -13,7 +13,13 @@ frontend:
       commands:
         # The build image ships several Node versions; package.json needs >= 20.19.
         - nvm use 22 || nvm install 22
-        - npm ci
+        # `npm install`, not `npm ci`. The @aws-amplify/backend* devDependencies
+        # use bundleDependencies, which npm resolves into a lockfile that `npm ci`
+        # rejects as out of sync ("Missing: @opentelemetry/core", then
+        # "@aws-cdk/toolkit-lib") even straight after a clean regeneration.
+        # `install` tolerates it and still honours the lockfile for everything
+        # else. Revisit if those devDependencies ever leave the tree.
+        - npm install --no-audit --no-fund
     build:
       commands:
         - npm run build
