@@ -5,18 +5,29 @@
   border-radius: var(--radius);
 }
 
+/* Grows past the wrapper once there are more players than a phone fits, which
+   is what gives the wrapper something to scroll. */
 .table {
-  width: 100%;
-  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
 
+/* Pinned: scrolling sideways through a full table must never leave a column of
+   bare numbers with nothing saying which category each one belongs to. */
 .category {
+  position: sticky;
+  left: 0;
+  z-index: 1;
   text-align: left;
   padding: 7px 12px;
   font-size: 0.8125rem;
   font-weight: 400;
   color: var(--text);
+  background: var(--surface);
+  box-shadow: 1px 0 0 var(--border);
   border-bottom: 1px solid var(--border-soft);
   white-space: nowrap;
 }
@@ -29,6 +40,7 @@ thead .category {
 }
 
 .head {
+  min-width: 44px;
   padding: 10px 8px;
   text-align: right;
   font-size: 0.75rem;
@@ -38,11 +50,16 @@ thead .category {
 }
 
 .cell {
+  min-width: 44px;
   padding: 7px 8px;
   text-align: right;
   font-size: 0.875rem;
   color: var(--text-h);
   border-bottom: 1px solid var(--border-soft);
+}
+
+.activeColumn {
+  background: var(--accent-wash);
 }
 
 .cell:last-child,
@@ -62,6 +79,12 @@ thead .category {
 .subtotal .cell {
   font: 600 0.6875rem/1.3 var(--mono);
   color: var(--text-muted);
+}
+
+/* The pinned column carries its own background, so it has to repeat whatever
+   tint the row it sits in would otherwise have given it. */
+.subtotal .category {
+  background: var(--surface-sub);
 }
 
 .total .category,

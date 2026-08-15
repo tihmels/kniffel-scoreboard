@@ -13,7 +13,7 @@ import {
   UPPER_CATEGORIES,
 } from '../../domain/scoring'
 import type { ScoreCategory } from '../../domain/scoring'
-import { CATEGORY_LABELS, initials } from './labels'
+import { CATEGORY_LABELS, shortLabels } from './labels'
 import { ScratchMark } from './ScratchMark'
 import styles from './ScoreGrid.module.css'
 
@@ -44,6 +44,13 @@ function bonusCell(card: ScoreCard): TotalCell {
 export function ScoreGrid({ state }: ScoreGridProps) {
   const cardOf = (playerId: string): ScoreCard => state.scores[playerId] ?? {}
   const activeId = state.players[state.activePlayerIndex]?.id
+  const headers = shortLabels(state.players.map((player) => player.name))
+
+  // Past five players the grid is wider than a phone, so the active column can
+  // be scrolled far from the header that names it. Tinting the whole column
+  // keeps it findable wherever the sheet happens to sit.
+  const columnOf = (playerId: string) =>
+    playerId === activeId ? (styles.activeColumn ?? '') : ''
 
   function renderCategoryRow(category: ScoreCategory) {
     return (
@@ -54,7 +61,10 @@ export function ScoreGrid({ state }: ScoreGridProps) {
         {state.players.map((player) => {
           const value = cardOf(player.id)[category]
           return (
-            <td key={player.id} className={styles.cell}>
+            <td
+              key={player.id}
+              className={`${styles.cell} ${columnOf(player.id)}`}
+            >
               {value === undefined ? (
                 <span className={styles.open}>·</span>
               ) : value === 0 ? (
@@ -87,9 +97,9 @@ export function ScoreGrid({ state }: ScoreGridProps) {
           return (
             <td
               key={player.id}
-              className={`${styles.cell} ${cell.tone ?? ''} ${
-                live ? (styles.live ?? '') : ''
-              }`}
+              className={`${styles.cell} ${columnOf(player.id)} ${
+                cell.tone ?? ''
+              } ${live ? (styles.live ?? '') : ''}`}
             >
               {cell.text}
             </td>
@@ -107,16 +117,16 @@ export function ScoreGrid({ state }: ScoreGridProps) {
             <th scope="col" className={styles.category}>
               Kategorie
             </th>
-            {state.players.map((player) => (
+            {state.players.map((player, index) => (
               <th
                 key={player.id}
                 scope="col"
-                className={`${styles.head} ${
+                className={`${styles.head} ${columnOf(player.id)} ${
                   player.id === activeId ? styles.live : ''
                 }`}
                 title={player.name}
               >
-                {initials(player.name)}
+                {headers[index]}
               </th>
             ))}
           </tr>

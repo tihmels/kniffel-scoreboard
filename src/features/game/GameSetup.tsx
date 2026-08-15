@@ -6,8 +6,11 @@ import { AppBar } from './AppBar'
 import { HistoryScreen } from './HistoryScreen'
 import styles from './GameSetup.module.css'
 
-/** Kniffel stays sociable at this size; beyond it the standings strip breaks up. */
-const MAX_PLAYERS = 5
+/**
+ * A full table. Beyond eight the standings strip needs a third row above the
+ * score rows, and the overview grid drops below a legible column per player.
+ */
+const MAX_PLAYERS = 8
 
 interface GameSetupProps {
   state: GameState
