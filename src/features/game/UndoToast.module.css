@@ -1,14 +1,17 @@
-/* Floats clear of the fixed bottom bar rather than resting on it: the bar's own
-   height is inherited, so the two cannot drift apart, and the standing gap
-   matches the margin the toast already keeps at its sides. */
+/* Floats clear of the fixed bottom bar rather than resting on it. The bar's own
+   height is inherited so the two cannot drift apart, and the gap above it is
+   part of the offset rather than a bottom margin: engines disagree over whether
+   a sticky offset is resolved against the margin box or the border box, and a
+   margin here is honoured by Blink but dropped by WebKit, which lands the toast
+   flush on the bar on iOS. Carried in the offset, it holds in both. */
 .toast {
   position: sticky;
-  bottom: var(--bottom-bar, 0px);
+  bottom: calc(var(--bottom-bar, 0px) + 0.75rem);
   z-index: 4;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin: 0 1rem 1rem;
+  margin: 0 1rem;
   padding: 0.625rem 0.75rem 0.625rem 0.875rem;
   background: #08060d;
   border-radius: var(--radius);
